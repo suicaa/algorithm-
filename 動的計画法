@@ -1,0 +1,334 @@
+'''
+ルール1：売買の度に、取引額（株価×数量）の5%の手数料（端数切上）がかかります。
+ルール2：同時刻に取引できるのは、銘柄ごとに最大10,000株までです。
+'''
+def find_fucking_highest_return(n, m, q, StockA, StockB, StockC):
+    holdA_B_C      = [0] * n
+    holdA_BunholdC = [0] * n
+    holdA_CunholdB = [0] * n
+    holdAunholdB_C = [0] * n
+    holdB_CunholdA = [0] * n
+    holdBunholdA_C = [0] * n
+    holdCunholdA_B = [0] * n
+    unholdA_B_C    = [0] * n
+
+    # initial state↓ begin here
+    # ------time0↓------
+    holdA_B_C[0] = 0 - StockA[0] - StockB[0] - StockC[0]
+    holdA_BunholdC[0] = 0 - StockA[0] - StockB[0]
+    holdA_CunholdB[0] = 0 - StockA[0] - StockC[0]
+    holdAunholdB_C[0] = 0 - StockA[0]
+    holdB_CunholdA[0] = 0 - StockC[0] - StockB[0]
+    holdBunholdA_C[0] = 0 - StockB[0]
+    holdCunholdA_B[0] = 0 - StockC[0]
+    unholdA_B_C[0] = 0
+
+    # ------time1↓------
+    holdA_B_C     [1] = max(holdA_B_C[1 - 1], holdA_BunholdC[1 - 1] - StockC[1],
+                           holdB_CunholdA[1 - 1] - StockA[1],
+                           holdA_CunholdB[1 - 1] - StockB[1],
+                           holdAunholdB_C[1 - 1] - StockB[1] - StockC[1],
+                           holdBunholdA_C[1 - 1] - StockA[1] - StockC[1],
+                           holdCunholdA_B[1 - 1] - StockA[1] - StockB[1],
+                           unholdA_B_C[1 - 1] - StockA[1] - StockB[1] - StockC[1])
+    holdA_BunholdC[1] = max(holdA_BunholdC[1 - 1],
+                           holdAunholdB_C[1 - 1] - StockB[1],
+                           holdBunholdA_C[1 - 1] - StockA[1],
+                           unholdA_B_C[1 - 1] - StockA[1] - StockB[1],
+                           holdA_B_C[1 - 1] + StockC[1],
+                           holdA_CunholdB[1 - 1] + StockC[1] - StockB[1],
+                           holdB_CunholdA[1 - 1] + StockC[1] - StockA[1],
+                           holdCunholdA_B[1 - 1] + StockC[1] - StockA[1] - StockB[1])
+    holdA_CunholdB[1] = max(holdA_CunholdB[1 - 1],
+                            holdAunholdB_C[1 - 1] - StockC[1],
+                            holdCunholdA_B[1 - 1] - StockA[1],
+                            unholdA_B_C[1 - 1] - StockA[1] - StockC[1],
+                            holdA_B_C[1 - 1] + StockB[1],
+                            holdA_BunholdC[1 - 1] + StockB[1] - StockC[1],
+                            holdB_CunholdA[1 - 1] + StockB[1] - StockA[1],
+                            holdBunholdA_C[1 - 1] + StockB[1] - StockA[1] - StockC[1])
+    holdB_CunholdA[1] = max(holdB_CunholdA[1 - 1],
+                            holdBunholdA_C[1 - 1] - StockC[1],
+                            holdCunholdA_B[1 - 1] - StockB[1],
+                            unholdA_B_C[1 - 1] - StockB[1] - StockC[1],
+                            holdA_B_C[1 - 1] + StockA[1],
+                            holdA_BunholdC[1 - 1] + StockA[1] - StockC[1],
+                            holdA_CunholdB[1 - 1] + StockA[1] - StockB[1],
+                            holdAunholdB_C[1 - 1] + StockA[1] - StockB[1] - StockC[1])
+    holdAunholdB_C[1] = max(holdAunholdB_C[1 - 1],
+                            holdA_B_C[1 - 1]      + StockB[1] + StockC[1],
+                            holdA_BunholdC[1 - 1] + StockB[1],
+                            holdA_CunholdB[1 - 1] + StockC[1],
+                            unholdA_B_C[1 - 1]    - StockA[1],
+                            holdB_CunholdA[1 - 1] - StockA[1] + StockB[1] + StockC[1],
+                            holdBunholdA_C[1 - 1] - StockA[1] + StockB[1],
+                            holdCunholdA_B[1 - 1] - StockA[1] + StockC[1])
+    holdBunholdA_C[1] = max(holdBunholdA_C[1 - 1],
+                            holdA_B_C[1 - 1]      + StockA[1] + StockC[1],
+                            holdA_BunholdC[1 - 1] + StockA[1],
+                            holdB_CunholdA[1 - 1] + StockC[1],
+                            unholdA_B_C[1 - 1]    - StockB[1],
+                            holdA_CunholdB[1 - 1] - StockB[1] + StockA[1] + StockC[1],
+                            holdAunholdB_C[1 - 1] - StockB[1] + StockA[1],
+                            holdCunholdA_B[1 - 1] - StockB[1] + StockC[1])
+
+    holdCunholdA_B[1] = max(holdCunholdA_B[1 - 1],
+                            holdA_B_C[1 - 1]      + StockB[1] + StockA[1],
+                            holdB_CunholdA[1 - 1] + StockB[1],
+                            holdA_CunholdB[1 - 1] + StockA[1],
+                            unholdA_B_C[1 - 1]    - StockC[1],
+                            holdA_BunholdC[1 - 1] - StockC[1] + StockB[1],
+                            holdBunholdA_C[1 - 1] - StockC[1] + StockB[1],
+                            holdAunholdB_C[1 - 1] - StockC[1] + StockA[1])
+
+    unholdA_B_C[1] =    max(unholdA_B_C[1 - 1],
+                            holdA_B_C[1 - 1] + StockA[1] + StockB[1] + StockC[1],
+                            holdA_BunholdC[1 - 1] + StockA[1] + StockB[1],
+                            holdA_CunholdB[1 - 1] + StockA[1] + StockC[1],
+                            holdAunholdB_C[1 - 1] + StockA[1],
+                            holdB_CunholdA[1 - 1] + StockB[1] + StockC[1],
+                            holdBunholdA_C[1 - 1] + StockB[1],
+                            holdCunholdA_B[1 - 1] + StockC[1])
+    
+    # initial state↑ end here
+    # print Eg: sell(A, t)
+    for i in range(2, n):
+        holdA_B_C     [i] = max(holdA_B_C[i - 1], holdA_BunholdC[i - 1] - StockC[i],
+                                holdB_CunholdA[i - 1] - StockA[i],
+                                holdA_CunholdB[i - 1] - StockB[i],
+                                holdAunholdB_C[i - 1] - StockB[i] - StockC[i],
+                                holdBunholdA_C[i - 1] - StockA[i] - StockC[i],
+                                holdCunholdA_B[i - 1] - StockA[i] - StockB[i],
+                                unholdA_B_C[i - 1] - StockA[i] - StockB[i] - StockC[i])
+
+        holdA_BunholdC[i] = max(holdA_BunholdC[i - 1],
+                                holdAunholdB_C[i - 1] - StockB[i],
+                                holdBunholdA_C[i - 1] - StockA[i],
+                                unholdA_B_C[i - 1] - StockA[i] - StockB[i],
+                                holdA_B_C[i - 1] + StockC[i],
+                                holdA_CunholdB[i - 1] + StockC[i] - StockB[i],
+                                holdB_CunholdA[i - 1] + StockC[i] - StockA[i],
+                                holdCunholdA_B[i - 1] + StockC[i] - StockA[i] - StockB[i])
+        holdA_CunholdB[i] = max(holdA_CunholdB[i - 1],
+                                holdAunholdB_C[i - 1] - StockC[i],
+                                holdCunholdA_B[i - 1] - StockA[i],
+                                unholdA_B_C[i - 1] - StockA[i] - StockC[i],
+                                holdA_B_C[i - 1] + StockB[i],
+                                holdA_BunholdC[i - 1] + StockB[i] - StockC[i],
+                                holdB_CunholdA[i - 1] + StockB[i] - StockA[i],
+                                holdBunholdA_C[i - 1] + StockB[i] - StockA[i] - StockC[i])
+
+        holdB_CunholdA[i] = max(holdB_CunholdA[i - 1],
+                                holdBunholdA_C[i - 1] - StockC[i],
+                                holdCunholdA_B[i - 1] - StockB[i],
+                                unholdA_B_C[i - 1] - StockB[i] - StockC[i],
+                                holdA_B_C[i - 1] + StockA[i],
+                                holdA_BunholdC[i - 1] + StockA[i] - StockC[i],
+                                holdA_CunholdB[i - 1] + StockA[i] - StockB[i],
+                                holdAunholdB_C[i - 1] + StockA[i] - StockB[i] - StockC[i])
+        holdAunholdB_C[i] = max(holdAunholdB_C[i - 1],
+                                holdA_B_C[i - 1]      + StockB[i] + StockC[i],
+                                holdA_BunholdC[i - 1] + StockB[i],
+                                holdA_CunholdB[i - 1] + StockC[i],
+                                unholdA_B_C[i - 1]    - StockA[i],
+                                holdB_CunholdA[i - 1] - StockA[i] + StockB[i] + StockC[i],
+                                holdBunholdA_C[i - 1] - StockA[i] + StockB[i],
+                                holdCunholdA_B[i - 1] - StockA[i] + StockC[i])
+
+        holdBunholdA_C[i] = max(holdBunholdA_C[i - 1],
+                                holdA_B_C[i - 1]      + StockA[i] + StockC[i],
+                                holdA_BunholdC[i - 1] + StockA[i],
+                                holdB_CunholdA[i - 1] + StockC[i],
+                                unholdA_B_C[i - 1]    - StockB[i],
+                                holdA_CunholdB[i - 1] - StockB[i] + StockA[i] + StockC[i],
+                                holdAunholdB_C[i - 1] - StockB[i] + StockA[i],
+                                holdCunholdA_B[i - 1] - StockB[i] + StockC[i])
+
+
+        holdCunholdA_B[i] = max(holdCunholdA_B[i - 1],
+                                holdA_B_C[i - 1]      + StockB[i] + StockA[i],
+                                holdB_CunholdA[i - 1] + StockB[i],
+                                holdA_CunholdB[i - 1] + StockA[i],
+                                unholdA_B_C[i - 1]    - StockC[i],
+                                holdA_BunholdC[i - 1] - StockC[i] + StockB[i] + StockA[i],
+                                holdBunholdA_C[i - 1] - StockC[i] + StockB[i],
+                                holdAunholdB_C[i - 1] - StockC[i] + StockA[i])
+        unholdA_B_C[i] =    max(unholdA_B_C[i - 1],
+                                holdA_B_C[i - 1] + StockA[i] + StockB[i] + StockC[i],
+                                holdA_BunholdC[i - 1] + StockA[i] + StockB[i],
+                                holdA_CunholdB[i - 1] + StockA[i] + StockC[i],
+                                holdAunholdB_C[i - 1] + StockA[i],
+                                holdB_CunholdA[i - 1] + StockB[i] + StockC[i],
+                                holdBunholdA_C[i - 1] + StockB[i],
+                                holdCunholdA_B[i - 1] + StockC[i])
+
+
+        if holdA_B_C[i] == max(holdA_B_C[i], holdA_BunholdC[i], holdA_CunholdB[i], holdAunholdB_C[i],
+                               holdB_CunholdA[i], holdBunholdA_C[i], holdCunholdA_B[i], unholdA_B_C[i]):
+            if holdA_B_C[i] == holdA_BunholdC[i - 1] - StockC[i]:
+                print("buy(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdA_B_C[i] == holdB_CunholdA[i - 1] - StockA[i]:
+                print("buy(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdA_B_C[i] == holdAunholdB_C[i - 1] - StockB[i] - StockC[i]:
+                print("buy(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("buy(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdA_B_C[i] == holdBunholdA_C[i - 1] - StockA[i] - StockC[i]:
+                print("buy(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("buy(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdA_B_C[i] == holdCunholdA_B[i - 1] - StockA[i] - StockB[i]:
+                print("buy(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("buy(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdA_B_C[i] == unholdA_B_C[i - 1] - StockA[i] - StockB[i] - StockC[i]:
+                print("buy(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("buy(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("buy(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+        if holdA_BunholdC[i] == max(holdA_B_C[i], holdA_BunholdC[i], holdA_CunholdB[i], holdAunholdB_C[i],
+                               holdB_CunholdA[i], holdBunholdA_C[i], holdCunholdA_B[i], unholdA_B_C[i]):
+            if holdA_BunholdC[i] == holdAunholdB_C[i - 1] - StockB[i]:
+                print("buy(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdA_BunholdC[i] == holdBunholdA_C[i - 1] - StockA[i]:
+                print("sell(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdA_BunholdC[i] == unholdA_B_C[i - 1] - StockA[i] - StockB[i]:
+                print("buy(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("buy(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdA_BunholdC[i] == holdA_B_C[i - 1] + StockC[i]:
+                print("sell(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdA_BunholdC[i] == holdA_CunholdB[i - 1] + StockC[i] - StockB[i]:
+                print("sell(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("buy(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdA_BunholdC[i] == holdB_CunholdA[i - 1] + StockC[i] - StockA[i]:
+                print("sell(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("buy(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdA_BunholdC[i] == holdCunholdA_B[i - 1] + StockC[i] - StockA[i] - StockB[i]:
+                print("sell(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("buy(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("buy(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+        if holdA_CunholdB[i]  == max(holdA_B_C[i], holdA_BunholdC[i], holdA_CunholdB[i], holdAunholdB_C[i],
+                               holdB_CunholdA[i], holdBunholdA_C[i], holdCunholdA_B[i], unholdA_B_C[i]):
+            if holdA_CunholdB[i] == holdAunholdB_C[i - 1] - StockC[i]:
+                print("buy(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdA_CunholdB[i] == holdCunholdA_B[i - 1] - StockA[i]:
+                print("buy(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdA_CunholdB[i] == unholdA_B_C[i - 1] - StockA[i] - StockC[i]:
+                print("buy(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("buy(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdA_CunholdB[i] == holdA_B_C[i - 1] + StockB[i]:
+                print("sell(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdA_CunholdB[i] == holdA_BunholdC[i - 1] + StockB[i] - StockC[i]:
+                print("buy(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("sell(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdA_CunholdB[i] == holdB_CunholdA[i - 1] + StockB[i] - StockA[i]:
+                print("buy(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("sell(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdA_CunholdB[i] == holdBunholdA_C[i - 1] + StockB[i] - StockA[i] - StockC[i]:
+                print("buy(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("sell(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("buy(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+
+        if holdB_CunholdA[i] == max(holdA_B_C[i], holdA_BunholdC[i], holdA_CunholdB[i], holdAunholdB_C[i],
+                                 holdB_CunholdA[i], holdBunholdA_C[i], holdCunholdA_B[i], unholdA_B_C[i]):
+            if holdBunholdA_C[i] == holdA_B_C[i - 1] + StockA[i] + StockC[i]:
+                print("buy(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("buy(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdBunholdA_C[i] == holdA_BunholdC[i - 1] + StockA[i]:
+                print("buy(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdBunholdA_C[i] == holdB_CunholdA[i - 1] + StockC[i]:
+                print("buy(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdBunholdA_C[i] == unholdA_B_C[i - 1] - StockB[i]:
+                print("sell(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+
+        if holdAunholdB_C[i] == max(holdA_B_C[i], holdA_BunholdC[i], holdA_CunholdB[i], holdAunholdB_C[i],
+                                    holdB_CunholdA[i], holdBunholdA_C[i], holdCunholdA_B[i], unholdA_B_C[i]):
+            if holdAunholdB_C[i] == holdA_B_C[i - 1]      + StockB[i] + StockC[i]:
+                print("sell(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("sell(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdAunholdB_C[i] == holdA_BunholdC[i - 1] + StockB[i]:
+
+                print("sell(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+
+            if holdAunholdB_C[i] == holdA_CunholdB[i - 1] + StockC[i]:
+                print("sell(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdAunholdB_C[i] == unholdA_B_C[i - 1]    - StockA[i]:
+                print("buy(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdAunholdB_C[i] == holdB_CunholdA[i - 1] - StockA[i] + StockB[i] + StockC[i]:
+                print("buy(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("sell(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+
+        if holdBunholdA_C[i] == max(holdA_B_C[i], holdA_BunholdC[i], holdA_CunholdB[i], holdAunholdB_C[i],
+                                 holdB_CunholdA[i], holdBunholdA_C[i], holdCunholdA_B[i], unholdA_B_C[i]):
+            if holdBunholdA_C[i] == holdA_B_C[i - 1] + StockA[i] + StockC[i]:
+                print("sell(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("sell(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+
+            if holdBunholdA_C[i] == holdA_BunholdC[i - 1] + StockA[i]:
+                print("sell(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdBunholdA_C[i] == holdB_CunholdA[i - 1] + StockC[i]:
+                print("sell(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdBunholdA_C[i] == unholdA_B_C[i - 1] - StockB[i]:
+                print("buy(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdBunholdA_C[i] == holdA_CunholdB[i - 1] - StockB[i] + StockA[i] + StockC[i]:
+                print("buy(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("sell(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("sell(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdBunholdA_C[i] == holdAunholdB_C[i - 1] - StockB[i] + StockA[i]:
+                print("buy(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("sell(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdBunholdA_C[i] == holdCunholdA_B[i - 1] - StockB[i] + StockC[i]:
+                print("buy(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("sell(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+
+        if holdCunholdA_B[i] == max(holdA_B_C[i], holdA_BunholdC[i], holdA_CunholdB[i], holdAunholdB_C[i],
+                                 holdB_CunholdA[i], holdBunholdA_C[i], holdCunholdA_B[i], unholdA_B_C[i]):
+            if holdCunholdA_B[i] == holdA_B_C[i - 1]      + StockB[i] + StockA[i]:
+                print("sell(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("sell(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdCunholdA_B[i] == holdB_CunholdA[i - 1] + StockB[i]:
+                print("sell(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdCunholdA_B[i] == holdA_CunholdB[i - 1] + StockA[i]:
+                print("sell(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdCunholdA_B[i] == unholdA_B_C[i - 1]    - StockC[i]:
+                print("buy(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if holdCunholdA_B[i] == holdA_BunholdC[i - 1] - StockC[i] + StockB[i] + StockA[i]:
+                print("buy(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+
+        if unholdA_B_C[i] == max(holdA_B_C[i], holdA_BunholdC[i], holdA_CunholdB[i], holdAunholdB_C[i],
+                                  holdB_CunholdA[i], holdBunholdA_C[i], holdCunholdA_B[i], unholdA_B_C[i]):
+            if unholdA_B_C[i] == holdA_B_C[i - 1] + StockA[i] + StockB[i] + StockC[i]:
+                print("sell(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("sell(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("sell(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if unholdA_B_C[i] == holdA_BunholdC[i - 1] + StockA[i] + StockB[i]:
+                print("sell(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("sell(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if unholdA_B_C[i] == holdA_CunholdB[i - 1] + StockA[i] + StockC[i]:
+                print("sell(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("sell(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if unholdA_B_C[i] == holdAunholdB_C[i - 1] + StockA[i]:
+                print("sell(A", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if unholdA_B_C[i] == holdB_CunholdA[i - 1] + StockB[i] + StockC[i]:
+                print("sell(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+                print("sell(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if unholdA_B_C[i] == holdBunholdA_C[i - 1] + StockB[i]:
+                print("sell(B", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+            if unholdA_B_C[i] == holdCunholdA_B[i - 1] + StockC[i]:
+                print("sell(C", end=""), print(",", end=" "), print(i, end=""), print(")", end="\n")
+
+    return unholdA_B_C[-1]
+
+    # State transition equation ↑
+
+# input & output↓
+n = int(input())
+StockA = []
+for i in range(n):
+    StockA.append(int(input()))
+m = int(input())
+StockB = []
+for i in range(m):
+    StockB.append(int(input()))
+q = int(input())
+StockC = []
+for i in range(q):
+    StockC.append(int(input()))
+
+print(find_fucking_highest_return(n, m, q, StockA, StockB, StockC))
