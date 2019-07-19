@@ -1,0 +1,144 @@
+'''
+ルール1：売買の度に、取引額（株価×数量）の5%の手数料（端数切上）がかかります。
+ルール2：同時刻に取引できるのは、銘柄ごとに最大10,000株までです。
+'''
+
+def find_highest_return(StockA, StockB, StockC):
+    begin = 0
+    end = 1
+    while end < 512:
+        maxProA = 0
+        maxProB = 0
+        maxProC = 0
+        curStockA = []
+        curStockB = []
+        curStockC = []
+
+        # ------automatically choose section begin------
+        endA = end
+        i = 0
+        for j in range(begin, len(StockA)):
+            if StockA[j] > StockA[j - 1] or StockA[j + 1] > StockA[j]:
+                if j - i + 1 > endA - begin:
+                    if StockA[j + 1] > StockA[j - 1]:
+                        endA = j + 1
+                    else:
+                        endA = j
+            else:
+                break
+
+        endB = end
+        i = 0
+        for j in range(begin, len(StockB)):
+            if StockB[j] > StockB[j - 1] or StockB[j + 1] > StockB[j]:
+                if j - i + 1 > endB - begin:
+                    if StockB[j + 1] > StockB[j - 1]:
+                        endB = j + 1
+                    else:
+                        endB = j
+            else:
+                break
+
+        endC = end
+        i = 0
+        for j in range(begin, len(StockC)):
+            if StockC[j] > StockC[j - 1] or StockC[j + 1] > StockC[j]:
+                if j - i + 1 > endC - begin:
+                    if StockC[j + 1] > StockC[j - 1]:
+                        endC = j + 1
+                    else:
+                        endC = j
+            else:
+                break
+
+        end = max(endA, endB, endC)
+        # ------automatically choose section end-------
+
+        # ------divide section begin------
+        for i in range(begin, end):
+            curStockA.append(StockA[i])
+        for i in range(begin, end):
+            curStockB.append(StockB[i])
+        for i in range(begin, end):
+            curStockC.append(StockC[i])
+        print(curStockB)
+        # ------divide section end------
+
+        if begin != end:
+
+            curMinA = curStockA[0]
+            curMinB = curStockB[0]
+            curMinC = curStockC[0]
+
+            # ------buy and sell inside section begin------
+            for i in range(0, end - begin):
+                if curMinA > curStockA[i]:
+                    curMinA = curStockA[i]
+                if maxProA < curStockA[i] - curMinA:
+                    maxProA = curStockA[i] - curMinA
+                sellA = maxProA + curMinA
+                if sellA not in curStockA:
+                    maxProA = 0
+                else:
+                    sell_indexA = curStockA.index(sellA)
+
+            for i in range(0, end - begin):
+                if curMinB > curStockB[i]:
+                    curMinB = curStockB[i]
+                if maxProB < curStockB[i] - curMinB:
+                    maxProB = curStockB[i] - curMinB
+                sellB = maxProB + curMinB
+                if sellB not in curStockB:
+                    maxProB = 0
+                else:
+                    sell_indexB = curStockB.index(sellB)
+
+            for i in range(0, end - begin):
+                if curMinC > curStockC[i]:
+                    curMinC = curStockC[i]
+                if maxProC < curStockC[i] - curMinC:
+                    maxProC = curStockC[i] - curMinC
+                sellC = maxProC + curMinC
+                if sellC not in curStockC:
+                    maxProC = 0
+                else:
+                    sell_indexC = curStockC.index(sellC)
+
+            # ------buy and sell inside section end------
+
+            # ------judge which stock should buy and sell begin------
+            if maxProA == max(maxProA, maxProB, maxProC) and maxProA != 0:
+                print("buy(A", end=""), print(",", end=" ")
+                print(curStockA.index(curMinA) + begin, end=""), print(")", end="\n")
+                print("sell(A", end=""), print(",", end=" ")
+                print(sell_indexA + begin, end=""), print(")", end="\n")
+            if maxProB == max(maxProA, maxProB, maxProC) and maxProB != 0:
+                print("buy(B", end=""), print(",", end=" ")
+                print(curStockB.index(curMinB) + begin, end=""), print(")", end="\n")
+                print("sell(B", end=""), print(",", end=" ")
+                print(sell_indexB + begin, end=""), print(")", end="\n")
+            if maxProC == max(maxProA, maxProB, maxProC) and maxProC != 0:
+                print("buy(C", end=""), print(",", end=" ")
+                print(curStockC.index(curMinC) + begin, end=""), print(")", end="\n")
+                print("sell(C", end=""), print(",", end=" ")
+                print(sell_indexC + begin, end=""), print(")", end="\n")
+            # ------judge which stock should buy and sell end------
+        else:
+            end += 1
+        begin = end
+
+# input & output↓
+n = int(input())
+StockA = []
+for i in range(n):
+    StockA.append(int(input()))
+m = int(input())
+StockB = []
+for i in range(m):
+    StockB.append(int(input()))
+q = int(input())
+StockC = []
+for i in range(q):
+    StockC.append(int(input()))
+
+print(find_highest_return(StockA, StockB, StockC))
